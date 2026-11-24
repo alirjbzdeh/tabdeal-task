@@ -45,7 +45,8 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         {
           name: 'description',
-          content: 'Browse and search every Rick and Morty character, their episodes and locations.',
+          content:
+            'Browse and search every Rick and Morty character, their episodes and locations.',
         },
         { name: 'color-scheme', content: 'dark' },
         { name: 'theme-color', content: '#0E0E0E' },
@@ -58,8 +59,9 @@ export default defineNuxtConfig({
     },
   },
 
+  // No fixed preset: Nitro detects Netlify on their build servers, and local
+  // builds stay `node-server` so `npm run preview` and E2E tests work.
   nitro: {
-    preset: 'netlify',
     compressPublicAssets: true,
   },
 })

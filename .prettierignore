@@ -3,3 +3,6 @@
 .netlify
 node_modules
 package-lock.json
+coverage
+test-results
+playwright-report
