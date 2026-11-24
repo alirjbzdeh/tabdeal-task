@@ -1,8 +1,8 @@
 import type { Character, CharacterStatus } from '~/types/api'
 
-/** "Dead-Human", "Alive-Alien", "Unknown-Robot" (no spaces around the dash, as in the design). */
+/** "Dead-Human", "Alive-Alien", "Unknown-Unknown" (no spaces around the dash, as in the design). */
 export function formatStatusLine(character: Pick<Character, 'status' | 'species'>): string {
-  return `${capitalize(character.status)}-${character.species}`
+  return `${capitalize(character.status)}-${capitalize(character.species)}`
 }
 
 export function statusTone(status: CharacterStatus): 'success' | 'danger' | 'unknown' {

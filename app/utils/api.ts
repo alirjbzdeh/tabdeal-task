@@ -19,3 +19,13 @@ export function idsFromUrls(urls: readonly string[]): number[] {
   const ids = urls.map(idFromUrl).filter((id): id is number => id !== null)
   return [...new Set(ids)]
 }
+
+/** True when an `$fetch` error is an HTTP 404. */
+export function isNotFound(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    ((error as { statusCode?: number }).statusCode === 404 ||
+      (error as { status?: number }).status === 404)
+  )
+}

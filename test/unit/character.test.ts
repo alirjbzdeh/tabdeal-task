@@ -7,8 +7,9 @@ describe('formatStatusLine', () => {
     expect(formatStatusLine({ status: 'Alive', species: 'Alien' })).toBe('Alive-Alien')
   })
 
-  it('capitalizes the "unknown" status', () => {
+  it('capitalizes "unknown" status and species', () => {
     expect(formatStatusLine({ status: 'unknown', species: 'Robot' })).toBe('Unknown-Robot')
+    expect(formatStatusLine({ status: 'Dead', species: 'unknown' })).toBe('Dead-Unknown')
   })
 })
 

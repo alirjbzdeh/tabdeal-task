@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { idFromUrl, idsFromUrls, toArray } from '~/utils/api'
+import { idFromUrl, idsFromUrls, isNotFound, toArray } from '~/utils/api'
 
 describe('toArray', () => {
   it('wraps a single object (API returns an object for one id)', () => {
@@ -37,5 +37,18 @@ describe('idsFromUrls', () => {
   it('keeps valid ids, drops empty ones and duplicates', () => {
     const base = 'https://rickandmortyapi.com/api/location/'
     expect(idsFromUrls([`${base}1`, '', `${base}3`, `${base}1`])).toEqual([1, 3])
+  })
+})
+
+describe('isNotFound', () => {
+  it('detects 404 errors from $fetch', () => {
+    expect(isNotFound({ statusCode: 404 })).toBe(true)
+    expect(isNotFound({ status: 404 })).toBe(true)
+  })
+
+  it('ignores other errors', () => {
+    expect(isNotFound({ statusCode: 500 })).toBe(false)
+    expect(isNotFound(new Error('network'))).toBe(false)
+    expect(isNotFound(null)).toBe(false)
   })
 })

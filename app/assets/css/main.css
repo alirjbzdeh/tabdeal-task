@@ -3,11 +3,16 @@
 /* Design tokens (from the Figma file). The app is dark-only. */
 @theme {
   --color-accent: #b2df28;
+  --color-on-accent: #00333d;
   --color-info: #0ad7f1;
   --color-danger: #ff1e00;
   --color-success: #00ff80;
   --color-base: #2c2e30;
   --color-base-dark: #0e0e0e;
+  --color-input: #3b3d3f;
+  --color-muted: #989a9c;
+  --color-line: #404244;
+  --color-placeholder: #999c9f52;
   --color-card: #0ad7f10a;
 
   --font-sans: 'Rubik', ui-sans-serif, system-ui, sans-serif;
@@ -20,6 +25,14 @@
 
   html,
   body {
-    @apply bg-base-dark font-sans text-white antialiased;
+    @apply bg-base font-sans text-white antialiased;
   }
+}
+
+/* Page column: 1608px of content (the Figma grid), centered, with side gutters. */
+@utility container-page {
+  width: 100%;
+  max-width: calc(1608px + 2rem);
+  margin-inline: auto;
+  padding-inline: 1rem;
 }

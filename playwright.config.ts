@@ -1,8 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const PORT = 3100
+const MOCK_API_PORT = 3101
 
-// E2E runs against a real production build, so it checks actual SSR output.
+// E2E runs against a real production build (so it checks actual SSR output), backed by a
+// local mock of the API: the real one is public and rate-limited, which makes tests flaky.
 export default defineConfig({
   testDir: 'test/e2e',
   fullyParallel: true,
@@ -17,11 +19,22 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
-  webServer: {
-    command: 'npm run build && node .output/server/index.mjs',
-    env: { PORT: String(PORT) },
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  webServer: [
+    {
+      command: 'node test/e2e/mock-api.mjs',
+      env: { PORT: String(MOCK_API_PORT) },
+      url: `http://localhost:${MOCK_API_PORT}/health`,
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: 'npm run build && node .output/server/index.mjs',
+      env: {
+        PORT: String(PORT),
+        NUXT_PUBLIC_API_BASE: `http://localhost:${MOCK_API_PORT}/api`,
+      },
+      url: `http://localhost:${PORT}`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 180_000,
+    },
+  ],
 })

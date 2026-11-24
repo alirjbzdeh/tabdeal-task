@@ -9,6 +9,12 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  // Inline all CSS into the SSR HTML (Tailwind output is small): no render-blocking
+  // stylesheet request before first paint.
+  features: {
+    inlineStyles: true,
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },
@@ -30,11 +36,20 @@ export default defineNuxtConfig({
     defaults: { subsets: ['latin'] },
   },
 
-  // Optimized, modern-format images. On Netlify this uses the Netlify Image CDN.
+  // On Netlify, images go through the Netlify Image CDN (modern formats, cached at the edge,
+  // one origin fetch per image). Everywhere else they load straight from the API's CDN:
+  // proxying them through ipx would hit the API's rate limit (20 avatars per page view).
   image: {
+    provider: process.env.NETLIFY ? 'netlify' : 'none',
     domains: ['rickandmortyapi.com'],
-    format: ['avif', 'webp'],
     quality: 75,
+  },
+
+  // API data never changes, so cache rendered pages (stale-while-revalidate).
+  // Fewer API calls, faster first byte. Error responses (>= 400) are never cached.
+  routeRules: {
+    '/': { swr: 3600 },
+    '/character/**': { swr: 86400 },
   },
 
   app: {
@@ -61,6 +76,19 @@ export default defineNuxtConfig({
 
   // No fixed preset: Nitro detects Netlify on their build servers, and local
   // builds stay `node-server` so `npm run preview` and E2E tests work.
+  // Prefetch a page when the user is about to open it (hover/focus/touch), not for every
+  // link that scrolls into view: 20 cards would mean 20 detail-page renders and API bursts.
+  experimental: {
+    // With SWR routes Nuxt would also fetch `_payload.json` on first load, competing with
+    // the LCP image for bandwidth. The data is already inlined in the HTML.
+    payloadExtraction: false,
+    defaults: {
+      nuxtLink: {
+        prefetchOn: { visibility: false, interaction: true },
+      },
+    },
+  },
+
   nitro: {
     compressPublicAssets: true,
   },
