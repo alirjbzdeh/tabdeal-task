@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+/* Design tokens (from the Figma file). The app is dark-only. */
+@theme {
+  --color-accent: #b2df28;
+  --color-info: #0ad7f1;
+  --color-danger: #ff1e00;
+  --color-success: #00ff80;
+  --color-base: #2c2e30;
+  --color-base-dark: #0e0e0e;
+  --color-card: #0ad7f10a;
+
+  --font-sans: 'Rubik', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    @apply bg-base-dark font-sans text-white antialiased;
+  }
+}
