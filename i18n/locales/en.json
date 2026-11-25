@@ -1,0 +1,113 @@
+{
+  "app": {
+    "name": "Rick and Morty",
+    "description": "Browse and search every Rick and Morty character, their episodes and locations.",
+    "home": "home page",
+    "skip": "Skip to content",
+    "language": "Language"
+  },
+  "search": {
+    "label": "Search characters by name",
+    "placeholder": "Search for characters...",
+    "button": "Search"
+  },
+  "pagination": {
+    "label": "Pagination",
+    "first": "First page",
+    "prev": "Previous page",
+    "next": "Next page",
+    "last": "Last page",
+    "page": "Page"
+  },
+  "home": {
+    "heading": "Rick and Morty characters",
+    "title": "Characters",
+    "titlePage": "Characters, page {page}",
+    "titleSearch": "Search: {name}",
+    "count": "No characters found | {count} character found | {count} characters found",
+    "loading": "Loading characters",
+    "noResults": "No characters found for “{name}”",
+    "noResultsHint": "Check the spelling or try another name.",
+    "clearSearch": "Clear search",
+    "emptyPage": "Nothing on this page",
+    "firstPage": "Go to the first page"
+  },
+  "character": {
+    "status": "Status",
+    "episodes": "Episodes",
+    "locations": "Locations",
+    "noEpisodes": "No episodes listed.",
+    "noLocations": "Origin and location are unknown.",
+    "species": "Species",
+    "type": "Type",
+    "gender": "Gender",
+    "origin": "Origin",
+    "lastLocation": "Last known location",
+    "firstSeen": "First seen in",
+    "episodeCode": "Episode",
+    "aired": "Aired",
+    "locationType": "Type",
+    "dimension": "Dimension",
+    "unknown": "Unknown",
+    "unknownType": "Unknown type",
+    "genders": {
+      "Female": "Female",
+      "Male": "Male",
+      "Genderless": "Genderless",
+      "unknown": "Unknown"
+    },
+    "describe": {
+      "kindFrom": "{name} is {article} {kind} from {origin}.",
+      "kind": "{name} is {article} {kind}.",
+      "unknownFrom": "{name} is a character of unknown species from {origin}.",
+      "unknown": "{name} is a character of unknown species.",
+      "a": "a",
+      "an": "an",
+      "seen": "{status}, last seen at {location}.",
+      "status": "{status}.",
+      "alive": "Alive",
+      "dead": "Dead",
+      "statusUnknown": "Status unknown",
+      "episodesOne": "Appears in {count} episode.",
+      "episodesOther": "Appears in {count} episodes."
+    }
+  },
+  "errors": {
+    "retry": "Try again",
+    "badRequest": {
+      "title": "Invalid request",
+      "message": "The Rick and Morty API didn't accept this request."
+    },
+    "notFound": {
+      "title": "Not found",
+      "message": "The Rick and Morty API couldn't find what you asked for."
+    },
+    "rateLimited": {
+      "title": "Too many requests",
+      "message": "The Rick and Morty API is busy right now. Wait a few seconds and try again."
+    },
+    "server": {
+      "title": "The API is having trouble",
+      "message": "The Rick and Morty API returned an error. Please try again in a moment."
+    },
+    "network": {
+      "title": "Can't reach the API",
+      "message": "We couldn't connect to the Rick and Morty API. Check your connection and try again."
+    },
+    "timeout": {
+      "title": "The request took too long",
+      "message": "The Rick and Morty API didn't answer in time. Please try again."
+    },
+    "unknown": {
+      "title": "Something went wrong",
+      "message": "An unexpected error happened. Please try again."
+    }
+  },
+  "errorPage": {
+    "notFoundTitle": "Page not found",
+    "notFoundText": "We couldn't find that character or page. It may have been sucked into a portal.",
+    "title": "Something went wrong",
+    "text": "An unexpected error happened. Please try again.",
+    "back": "Back to all characters"
+  }
+}

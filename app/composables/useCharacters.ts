@@ -8,7 +8,8 @@ const EMPTY: Paginated<Character> = {
 
 /**
  * Character list for a page, optionally filtered by name. Runs on the server (SSR)
- * and refetches when `name` or `page` change.
+ * and refetches when `name` or `page` change. The previous request is cancelled when they
+ * change (typing a new search, clicking the next page) or the page is left.
  * The API answers "no matches" (or a page past the end) with a 404, so that becomes an empty list.
  */
 export function useCharacters(name: MaybeRefOrGetter<string>, page: MaybeRefOrGetter<number>) {
@@ -16,10 +17,11 @@ export function useCharacters(name: MaybeRefOrGetter<string>, page: MaybeRefOrGe
 
   return useAsyncData(
     () => `characters:${toValue(name)}:${toValue(page)}`,
-    async () => {
+    async (_nuxtApp, { signal }) => {
       try {
         return await api<Paginated<Character>>('/character', {
           query: { page: toValue(page), name: toValue(name) || undefined },
+          signal,
         })
       } catch (error) {
         if (isNotFound(error)) return EMPTY
@@ -28,6 +30,7 @@ export function useCharacters(name: MaybeRefOrGetter<string>, page: MaybeRefOrGe
       }
     },
     {
+      timeout: API_TIMEOUT,
       // Only keep what the grid needs in the SSR payload (smaller HTML).
       transform: ({ info, results }) => ({
         info,

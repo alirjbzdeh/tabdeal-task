@@ -13,7 +13,7 @@ test.describe('home page', () => {
   test('search and page live in the URL and are server-rendered too', async ({ request }) => {
     const html = await (await request.get('/?name=test&page=2')).text()
     expect(html).toContain('value="test"')
-    expect(html).toMatch(/aria-current="page"[^>]*>\s*<span class="sr-only">Page<\/span>2/)
+    expect(html).toMatch(/aria-current="page"[^>]*>\s*<span class="sr-only">Page <\/span>2/)
   })
 
   test('shows 20 cards and no console errors', async ({ page }) => {

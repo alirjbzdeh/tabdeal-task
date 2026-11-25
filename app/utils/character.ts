@@ -25,27 +25,45 @@ export function orUnknown(value: string | null | undefined, fallback = 'Unknown'
   return value && value.toLowerCase() !== 'unknown' ? value : fallback
 }
 
+/** The bits of vue-i18n that `describeCharacter` needs (kept tiny so it's easy to unit test). */
+export interface Translator {
+  t: (key: string, named?: Record<string, unknown>) => string
+  number: (value: number) => string
+}
+
 /**
- * A short plain-English description, used on the page and as the meta description, e.g.
- * "Rick Sanchez is a human from Earth (C-137). Alive, last seen at Citadel of Ricks.
- * Appears in 51 episodes."
+ * A short description in the active language, used on the page and as the meta description,
+ * e.g. "Rick Sanchez is a human from Earth (C-137). Alive, last seen at Citadel of Ricks.
+ * Appears in 51 episodes." Names, species and places are API data and stay as they are.
  */
 export function describeCharacter(
   character: Pick<Character, 'name' | 'status' | 'species' | 'type' | 'origin' | 'location'>,
   episodeCount: number,
+  { t, number }: Translator,
 ): string {
   const { name, status, species, type, origin, location } = character
+  const key = (k: string) => `character.describe.${k}`
 
-  const knownSpecies = species && species.toLowerCase() !== 'unknown'
-  const kind = knownSpecies
-    ? `${/^[aeiou]/i.test(species) ? 'an' : 'a'} ${species.toLowerCase()}${type ? ` (${type})` : ''}`
-    : 'a character of unknown species'
-  const from = orUnknown(origin.name, '') ? ` from ${origin.name}` : ''
+  const knownSpecies = !!orUnknown(species, '')
+  const origins = orUnknown(origin.name, '')
+  const who = knownSpecies
+    ? t(key(origins ? 'kindFrom' : 'kind'), {
+        name,
+        article: t(key(/^[aeiou]/i.test(species) ? 'an' : 'a')),
+        kind: `${species.toLowerCase()}${type ? ` (${type})` : ''}`,
+        origin: origins,
+      })
+    : t(key(origins ? 'unknownFrom' : 'unknown'), { name, origin: origins })
 
-  const state = status === 'unknown' ? 'Status unknown' : status
-  const seen = orUnknown(location.name, '') ? `, last seen at ${location.name}` : ''
+  const state = t(key({ Alive: 'alive', Dead: 'dead', unknown: 'statusUnknown' }[status]))
+  const lastSeen = orUnknown(location.name, '')
+  const seen = lastSeen
+    ? t(key('seen'), { status: state, location: lastSeen })
+    : t(key('status'), { status: state })
 
-  const episodes = `Appears in ${episodeCount} ${episodeCount === 1 ? 'episode' : 'episodes'}.`
+  const episodes = t(key(episodeCount === 1 ? 'episodesOne' : 'episodesOther'), {
+    count: number(episodeCount),
+  })
 
-  return `${name} is ${kind}${from}. ${state}${seen}. ${episodes}`
+  return `${who} ${seen} ${episodes}`
 }

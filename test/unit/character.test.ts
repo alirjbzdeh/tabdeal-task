@@ -5,7 +5,10 @@ import {
   formatStatusLine,
   orUnknown,
   statusTone,
+  type Translator,
 } from '~/utils/character'
+import enMessages from '../../i18n/locales/en.json'
+import faMessages from '../../i18n/locales/fa.json'
 
 describe('formatStatusLine', () => {
   it('joins status and species with a dash and no spaces', () => {
@@ -47,6 +50,18 @@ describe('orUnknown', () => {
 })
 
 describe('describeCharacter', () => {
+  // A tiny stand-in for vue-i18n's t(), reading the real English messages.
+  const translator = (messages: Record<string, unknown>): Translator => ({
+    t: (key, named = {}) => {
+      const message = key
+        .split('.')
+        .reduce<unknown>((m, k) => (m as Record<string, unknown>)[k], messages)
+      return String(message).replace(/\{(\w+)\}/g, (_, name: string) => String(named[name]))
+    },
+    number: (value) => String(value),
+  })
+  const en = translator(enMessages)
+
   const rick = {
     name: 'Rick Sanchez',
     status: 'Alive' as const,
@@ -57,7 +72,7 @@ describe('describeCharacter', () => {
   }
 
   it('writes a short description', () => {
-    expect(describeCharacter(rick, 51)).toBe(
+    expect(describeCharacter(rick, 51, en)).toBe(
       'Rick Sanchez is a human from Earth (C-137). Alive, last seen at Citadel of Ricks. Appears in 51 episodes.',
     )
   })
@@ -71,11 +86,18 @@ describe('describeCharacter', () => {
       origin: { name: 'unknown', url: '' },
       location: { name: 'unknown', url: '' },
     }
-    expect(describeCharacter(squanchy, 1)).toBe(
+    expect(describeCharacter(squanchy, 1, en)).toBe(
       'Squanchy is a character of unknown species. Status unknown. Appears in 1 episode.',
     )
-    expect(describeCharacter({ ...rick, species: 'Alien', type: 'Parasite' }, 2)).toContain(
+    expect(describeCharacter({ ...rick, species: 'Alien', type: 'Parasite' }, 2, en)).toContain(
       'is an alien (Parasite) from',
+    )
+  })
+
+  it('uses the messages of the active language', () => {
+    const fa = translator(faMessages)
+    expect(describeCharacter(rick, 51, fa)).toBe(
+      'Rick Sanchez یک human اهل Earth (C-137) است. زنده، آخرین بار در Citadel of Ricks دیده شده است. در 51 قسمت حضور دارد.',
     )
   })
 })

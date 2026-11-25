@@ -29,3 +29,51 @@ export function isNotFound(error: unknown): boolean {
       (error as { status?: number }).status === 404)
   )
 }
+
+export type ApiErrorKind =
+  | 'aborted'
+  | 'badRequest'
+  | 'notFound'
+  | 'rateLimited'
+  | 'server'
+  | 'network'
+  | 'timeout'
+  | 'unknown'
+
+function statusOf(error: object): number | undefined {
+  const { statusCode, status, response } = error as {
+    statusCode?: number
+    status?: number
+    response?: { status?: number }
+  }
+  return statusCode ?? status ?? response?.status
+}
+
+/**
+ * Sorts an error from `$fetch` / `useAsyncData` into a kind we have a message for.
+ * Works on the raw FetchError and on the NuxtError it becomes after SSR (which keeps the
+ * status code and the message, but not the error class).
+ */
+export function classifyApiError(error: unknown): ApiErrorKind {
+  if (!error || typeof error !== 'object') return 'unknown'
+
+  const status = statusOf(error)
+  const { name = '', message = '' } = error as { name?: string; message?: string }
+  const cause = (error as { cause?: { name?: string } }).cause
+
+  // Timeouts and cancels arrive as aborts (no HTTP status). Check them before the status:
+  // Nuxt reports a failed request without a response as a 500.
+  if (name === 'TimeoutError' || cause?.name === 'TimeoutError' || /timed? ?out/i.test(message)) {
+    return 'timeout'
+  }
+  if (name === 'AbortError' || cause?.name === 'AbortError' || /\baborted\b/i.test(message)) {
+    return 'aborted'
+  }
+  if (/<no response>|fetch failed|failed to fetch|network/i.test(message)) return 'network'
+
+  if (status === 404) return 'notFound'
+  if (status === 429) return 'rateLimited'
+  if (status !== undefined && status >= 400 && status < 500) return 'badRequest'
+  if (status !== undefined && status >= 500) return 'server'
+  return 'unknown'
+}

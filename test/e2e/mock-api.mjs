@@ -97,8 +97,18 @@ function send(res, status, body, type = 'application/json') {
   res.end(type === 'application/json' ? JSON.stringify(body) : body)
 }
 
-function listCharacters(url, res) {
+// Special search terms that make the mock misbehave, for the error and cancel tests.
+const FAILURES = {
+  __429: [429, { error: 'Too many requests' }],
+  __500: [500, { error: 'Internal server error' }],
+  __400: [400, { error: 'Bad request' }],
+}
+
+async function listCharacters(url, res) {
   const name = (url.searchParams.get('name') ?? '').toLowerCase()
+  if (FAILURES[name]) return send(res, ...FAILURES[name])
+  // "slow..." answers after 1.5s, so a test can replace it with a newer search mid-flight.
+  if (name.startsWith('slow')) await new Promise((resolve) => setTimeout(resolve, 1500))
   const page = Number(url.searchParams.get('page') ?? 1)
   const matches = name ? characters.filter((c) => c.name.toLowerCase().includes(name)) : characters
   const pages = Math.ceil(matches.length / PAGE_SIZE)

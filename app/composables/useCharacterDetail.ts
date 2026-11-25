@@ -25,9 +25,10 @@ export function useCharacterDetail(id: MaybeRefOrGetter<number>) {
 
   return useAsyncData<CharacterDetail | null>(
     () => `character:${toValue(id)}`,
-    async () => {
+    // `signal` cancels these when the user leaves or opens another character first.
+    async (_nuxtApp, { signal }) => {
       try {
-        const character = await api<Character>(`/character/${toValue(id)}`)
+        const character = await api<Character>(`/character/${toValue(id)}`, { signal })
 
         const episodeIds = idsFromUrls(character.episode)
         // "unknown" origin/location has an empty URL, so it's skipped here.
@@ -35,10 +36,10 @@ export function useCharacterDetail(id: MaybeRefOrGetter<number>) {
 
         const [episodes, locations] = await Promise.all([
           episodeIds.length
-            ? api<Episode | Episode[]>(`/episode/${episodeIds.join(',')}`)
+            ? api<Episode | Episode[]>(`/episode/${episodeIds.join(',')}`, { signal })
             : ([] as Episode[]),
           locationIds.length
-            ? api<Location | Location[]>(`/location/${locationIds.join(',')}`)
+            ? api<Location | Location[]>(`/location/${locationIds.join(',')}`, { signal })
             : ([] as Location[]),
         ])
 
@@ -75,5 +76,6 @@ export function useCharacterDetail(id: MaybeRefOrGetter<number>) {
         throw error
       }
     },
+    { timeout: API_TIMEOUT },
   )
 }

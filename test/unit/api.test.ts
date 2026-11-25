@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { idFromUrl, idsFromUrls, isNotFound, toArray } from '~/utils/api'
+import { classifyApiError, idFromUrl, idsFromUrls, isNotFound, toArray } from '~/utils/api'
 
 describe('toArray', () => {
   it('wraps a single object (API returns an object for one id)', () => {
@@ -50,5 +50,38 @@ describe('isNotFound', () => {
     expect(isNotFound({ statusCode: 500 })).toBe(false)
     expect(isNotFound(new Error('network'))).toBe(false)
     expect(isNotFound(null)).toBe(false)
+  })
+})
+
+describe('classifyApiError', () => {
+  const httpError = (status: number) =>
+    Object.assign(new Error(`[GET] "/character": ${status}`), { statusCode: status })
+
+  it('maps HTTP statuses to a kind', () => {
+    expect(classifyApiError(httpError(400))).toBe('badRequest')
+    expect(classifyApiError(httpError(404))).toBe('notFound')
+    expect(classifyApiError(httpError(429))).toBe('rateLimited')
+    expect(classifyApiError(httpError(500))).toBe('server')
+    expect(classifyApiError(httpError(503))).toBe('server')
+    expect(classifyApiError({ response: { status: 429 } })).toBe('rateLimited')
+  })
+
+  it('spots timeouts, cancels and network failures (no HTTP status)', () => {
+    const timeout = new DOMException('signal timed out', 'TimeoutError')
+    expect(classifyApiError(timeout)).toBe('timeout')
+    expect(classifyApiError({ message: 'x', cause: { name: 'TimeoutError' } })).toBe('timeout')
+
+    const abort = new DOMException('AsyncData request cancelled by deduplication', 'AbortError')
+    expect(classifyApiError(abort)).toBe('aborted')
+
+    // What ofetch throws when the server can't be reached (Nuxt adds statusCode 500 after SSR).
+    const offline = { statusCode: 500, message: '[GET] "/character": <no response> fetch failed' }
+    expect(classifyApiError(offline)).toBe('network')
+  })
+
+  it('falls back to unknown', () => {
+    expect(classifyApiError(new Error('boom'))).toBe('unknown')
+    expect(classifyApiError(null)).toBe('unknown')
+    expect(classifyApiError('nope')).toBe('unknown')
   })
 })

@@ -9,6 +9,8 @@ const props = defineProps<{
   priority?: boolean
 }>()
 
+const localePath = useLocalePath()
+
 const dotClass = computed(
   () =>
     ({ success: 'bg-success', danger: 'bg-danger', unknown: 'bg-muted' })[
@@ -34,7 +36,7 @@ const dotClass = computed(
     <h2 class="mt-4 truncate text-xl leading-6 font-bold">
       <!-- The ::after overlay makes the whole card clickable with one link. -->
       <NuxtLink
-        :to="`/character/${character.id}`"
+        :to="localePath(`/character/${character.id}`)"
         class="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none"
       >
         {{ character.name }}

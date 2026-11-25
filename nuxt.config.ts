@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  modules: ['@nuxt/eslint', '@nuxt/image', '@nuxt/fonts'],
+  modules: ['@nuxt/eslint', '@nuxt/image', '@nuxt/fonts', '@nuxtjs/i18n'],
 
   css: ['~/assets/css/main.css'],
 
@@ -31,9 +31,30 @@ export default defineNuxtConfig({
 
   // Self-hosted Rubik with a metric-matched fallback: no render-blocking
   // third-party CSS, and no layout shift (CLS) when the font swaps in.
+  // Rubik has no Persian glyphs, so Vazirmatn covers the `fa` locale. Fonts are split by
+  // unicode-range, so English pages never download the Persian font (and vice versa).
   fonts: {
-    families: [{ name: 'Rubik', provider: 'google', weights: [400, 500, 700] }],
-    defaults: { subsets: ['latin'] },
+    families: [
+      { name: 'Rubik', provider: 'google', weights: [400, 500, 700], subsets: ['latin'] },
+      { name: 'Vazirmatn', provider: 'google', weights: [400, 500, 700], subsets: ['arabic'] },
+    ],
+  },
+
+  // English (default, no URL prefix) and Persian (/fa, right-to-left).
+  // A URL prefix instead of cookie/browser detection keeps every page cacheable (SWR) and
+  // crawlable, and each language gets its own hreflang link.
+  i18n: {
+    baseUrl: process.env.NUXT_PUBLIC_SITE_URL ?? 'https://tabdeal-task.vercel.app',
+    defaultLocale: 'en',
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: false,
+    // Skip vue-i18n's global components (<i18n-t> etc.); we only use $t / useI18n.
+    // The message compiler has to stay: the module sends messages to the browser as strings.
+    bundle: { fullInstall: false },
+    locales: [
+      { code: 'en', language: 'en-US', name: 'English', dir: 'ltr', file: 'en.json' },
+      { code: 'fa', language: 'fa-IR', name: 'فارسی', dir: 'rtl', file: 'fa.json' },
+    ],
   },
 
   // On Vercel / Netlify, images go through the host's image CDN (AVIF/WebP, cached at the edge,
@@ -53,20 +74,16 @@ export default defineNuxtConfig({
   // Fewer API calls, faster first byte. Error responses (>= 400) are never cached.
   routeRules: {
     '/': { swr: 3600 },
+    '/fa': { swr: 3600 },
     '/character/**': { swr: 86400 },
+    '/fa/character/**': { swr: 86400 },
   },
 
   app: {
     head: {
-      htmlAttrs: { lang: 'en' },
-      title: 'Rick and Morty Characters',
+      // lang/dir, title and description come from the active locale (app.vue).
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        {
-          name: 'description',
-          content:
-            'Browse and search every Rick and Morty character, their episodes and locations.',
-        },
         { name: 'color-scheme', content: 'dark' },
         { name: 'theme-color', content: '#0E0E0E' },
       ],
