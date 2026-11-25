@@ -1,10 +1,5 @@
 export type PageItem = number | 'ellipsis-start' | 'ellipsis-end'
 
-/**
- * Page numbers to show, as in the design: `1 2 3 4 5 …`.
- * Shows a window of up to `size` pages around the current one, with an ellipsis
- * on the side(s) where more pages exist.
- */
 export function getVisiblePages(current: number, total: number, size = 5): PageItem[] {
   if (total <= 1) return []
   const page = Math.min(Math.max(1, Math.trunc(current)), total)
@@ -21,7 +16,6 @@ export function getVisiblePages(current: number, total: number, size = 5): PageI
   return items
 }
 
-/** Reads a page number from a route query value. Falls back to 1. */
 export function parsePage(value: unknown): number {
   const raw = Array.isArray(value) ? value[0] : value
   const page = Number.parseInt(String(raw ?? ''), 10)

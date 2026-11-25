@@ -14,7 +14,6 @@ const page = computed(() => parsePage(route.query.page))
 const { data, status, error, refresh } = await useCharacters(name, page)
 const apiError = useApiError(error)
 
-// Don't answer 200 for a failed render (keeps it out of caches and search results).
 if (import.meta.server && apiError.value) {
   setResponseStatus(useRequestEvent()!, 503)
 }
@@ -37,7 +36,6 @@ function onSearch(value: string) {
   router.replace(localePath({ path: '/', query: queryFor(1, value) }))
 }
 
-// Pagination keeps the same path, so Nuxt won't scroll for us. Bring the grid back into view.
 const results = useTemplateRef('results')
 watch(page, () => {
   const el = results.value

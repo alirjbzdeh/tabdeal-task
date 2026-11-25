@@ -1,4 +1,3 @@
-<!-- Error page (404 for an unknown character or URL, anything else as a generic error). -->
 <script setup lang="ts">
 import type { NuxtError } from '#app'
 

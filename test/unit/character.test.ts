@@ -50,7 +50,6 @@ describe('orUnknown', () => {
 })
 
 describe('describeCharacter', () => {
-  // A tiny stand-in for vue-i18n's t(), reading the real English messages.
   const translator = (messages: Record<string, unknown>): Translator => ({
     t: (key, named = {}) => {
       const message = key

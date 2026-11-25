@@ -20,9 +20,16 @@ test.describe('languages', () => {
     const html = await (await request.get('/fa/character/1')).text()
     expect(html).toContain('قسمت‌ها')
     expect(html).toContain('مکان‌ها')
-    // December 2, 2013 in the Persian calendar, with the ISO date kept for machines.
     expect(html).toMatch(/datetime="2013-12-02"[^>]*>۱۱ آذر ۱۳۹۲/)
     expect(html).toContain('در ۵۱ قسمت حضور دارد')
+  })
+
+  test('the error page is translated and right-to-left too', async ({ request }) => {
+    const response = await request.get('/fa/character/99999', { headers: { accept: 'text/html' } })
+    expect(response.status()).toBe(404)
+    const html = await response.text()
+    expect(html).toMatch(/<html[^>]*lang="fa-IR"[^>]*dir="rtl"/)
+    expect(html).toContain('<title>صفحه پیدا نشد · ریک و مورتی</title>')
   })
 
   test('the language link keeps the current search and page', async ({ page }) => {

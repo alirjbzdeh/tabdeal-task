@@ -1,4 +1,3 @@
-<!-- Top of the detail page: portrait, name, status line, a short description and key facts. -->
 <script setup lang="ts">
 import type { CharacterSummary, EpisodeSummary } from '~/composables/useCharacterDetail'
 
@@ -44,18 +43,17 @@ const facts = computed(() => {
 </script>
 
 <template>
-  <section
-    aria-labelledby="character-name"
+  <header
     class="flex flex-col gap-6 pt-3 pb-8 md:flex-row md:items-center md:gap-12 md:pt-16 md:pb-16"
   >
-    <!-- The LCP element on this page: load it first. -->
     <NuxtImg
       :src="character.image"
-      :alt="character.name"
+      :alt="$t('character.portrait', { name: character.name })"
       width="240"
       height="240"
       loading="eager"
       fetchpriority="high"
+      :preload="{ fetchPriority: 'high' }"
       class="size-45 shrink-0 rounded-lg bg-placeholder object-cover md:size-60"
     />
     <div class="min-w-0">
@@ -75,5 +73,5 @@ const facts = computed(() => {
         </div>
       </dl>
     </div>
-  </section>
+  </header>
 </template>

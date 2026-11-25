@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test'
 
-// The mock API fails on purpose for these search terms (see mock-api.mjs).
 test.describe('API errors and cancelling', () => {
   test('a rate limit shows its own message, server-rendered, with a retry button', async ({
     request,
@@ -22,7 +21,6 @@ test.describe('API errors and cancelling', () => {
 
     await page.goto('/?name=__400')
     await expect(page.getByRole('heading', { name: 'Invalid request' })).toBeVisible()
-    // Retrying the same bad request won't help, so there's no retry button.
     await expect(page.getByRole('button', { name: 'Try again' })).toHaveCount(0)
   })
 
@@ -42,14 +40,12 @@ test.describe('API errors and cancelling', () => {
     const input = page.getByLabel('Search characters by name')
     await input.fill('slow')
     await page.waitForRequest((r) => r.url().includes('name=slow'))
-    // Before the slow answer arrives, search for something else.
     await input.fill('rick')
     await expect(page).toHaveURL(/\?name=rick$/)
     await expect(page.getByRole('link', { name: 'Rick Sanchez' })).toBeVisible()
 
     expect(cancelled).toHaveLength(1)
     expect(cancelled[0]).toMatch(/abort/i)
-    // The stale "no results" answer never replaces the new results.
     await page.waitForTimeout(1600)
     await expect(page.getByRole('link', { name: 'Rick Sanchez' })).toBeVisible()
   })

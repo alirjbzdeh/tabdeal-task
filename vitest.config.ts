@@ -7,7 +7,6 @@ const alias = { '~': fileURLToPath(new URL('./app', import.meta.url)) }
 export default defineConfig({
   test: {
     projects: [
-      // Pure logic: fast, plain Node.
       {
         resolve: { alias },
         test: {
@@ -16,7 +15,6 @@ export default defineConfig({
           environment: 'node',
         },
       },
-      // Components/pages inside a real Nuxt runtime.
       await defineVitestProject({
         test: {
           name: 'nuxt',

@@ -3,9 +3,7 @@ import type { Character } from '~/types/api'
 
 const props = defineProps<{
   character: Pick<Character, 'id' | 'name' | 'status' | 'species' | 'image'>
-  /** Above the fold on some screen: load right away instead of lazily. */
   eager?: boolean
-  /** The likely LCP image: fetch it before anything else. */
   priority?: boolean
 }>()
 
@@ -23,18 +21,17 @@ const dotClass = computed(
   <article
     class="relative rounded-2xl border border-transparent p-4 transition-colors focus-within:border-line hover:border-line"
   >
-    <!-- Decorative here: the name right below already says who it is (no double read-out). -->
     <NuxtImg
       :src="character.image"
-      alt=""
+      :alt="$t('character.portrait', { name: character.name })"
       width="300"
       height="300"
       :loading="eager || priority ? 'eager' : 'lazy'"
-      :fetchpriority="priority ? 'high' : 'auto'"
+      :fetchpriority="eager || priority ? 'high' : 'auto'"
+      :preload="priority ? { fetchPriority: 'high' } : false"
       class="aspect-square w-full rounded-lg bg-placeholder object-cover"
     />
     <h2 class="mt-4 truncate text-xl leading-6 font-bold">
-      <!-- The ::after overlay makes the whole card clickable with one link. -->
       <NuxtLink
         :to="localePath(`/character/${character.id}`)"
         class="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none"

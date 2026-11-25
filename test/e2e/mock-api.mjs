@@ -1,6 +1,3 @@
-// Tiny stand-in for the Rick and Morty API, used by the E2E tests.
-// The real API is public and rate-limited, so tests that hit it are flaky.
-// Run: node test/e2e/mock-api.mjs   (PORT, default 3101)
 import { createServer } from 'node:http'
 
 const PORT = Number(process.env.PORT ?? 3101)
@@ -11,7 +8,6 @@ const TOTAL = 826
 const api = (path) => `${ORIGIN}/api${path}`
 const range = (from, to) => Array.from({ length: to - from + 1 }, (_, i) => from + i)
 
-// Locations. Residents are included on purpose: the app must strip them from its payload.
 const locations = [
   [1, 'Earth (C-137)', 'Planet', 'Dimension C-137'],
   [2, 'Abadango', 'Cluster', 'unknown'],
@@ -29,7 +25,6 @@ const locations = [
 const place = (id) => ({ name: locations[id - 1].name, url: api(`/location/${id}`) })
 const UNKNOWN_PLACE = { name: 'unknown', url: '' }
 
-// 51 episodes, 10 per season. The first two have real names to assert on.
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August']
 const episodes = range(1, 51).map((id) => {
   const season = Math.ceil(id / 10)
@@ -51,16 +46,13 @@ const episodes = range(1, 51).map((id) => {
 })
 const episodeUrls = (ids) => ids.map((id) => api(`/episode/${id}`))
 
-// [name, status, species, type, origin, location, episode ids]
 const known = [
   ['Rick Sanchez', 'Alive', 'Human', '', place(1), place(3), range(1, 51)],
   ['Morty Smith', 'Alive', 'Human', '', UNKNOWN_PLACE, place(3), range(1, 51)],
   ['Summer Smith', 'Alive', 'Human', '', place(1), place(1), range(6, 51)],
   ['Beth Smith', 'Alive', 'Human', '', place(1), place(1), range(6, 51)],
   ['Jerry Smith', 'Alive', 'Human', '', place(1), place(1), range(6, 51)],
-  // Same origin and location: one location card.
   ['Birdperson', 'Dead', 'Bird-Person', '', place(4), place(4), [11, 22]],
-  // Single episode (the API returns an object, not an array) and no known places.
   ['Squanchy', 'unknown', 'unknown', 'Cat-Person', UNKNOWN_PLACE, UNKNOWN_PLACE, [16]],
 ]
 const statuses = ['Alive', 'Dead', 'unknown']
@@ -97,7 +89,6 @@ function send(res, status, body, type = 'application/json') {
   res.end(type === 'application/json' ? JSON.stringify(body) : body)
 }
 
-// Special search terms that make the mock misbehave, for the error and cancel tests.
 const FAILURES = {
   __429: [429, { error: 'Too many requests' }],
   __500: [500, { error: 'Internal server error' }],
@@ -107,7 +98,6 @@ const FAILURES = {
 async function listCharacters(url, res) {
   const name = (url.searchParams.get('name') ?? '').toLowerCase()
   if (FAILURES[name]) return send(res, ...FAILURES[name])
-  // "slow..." answers after 1.5s, so a test can replace it with a newer search mid-flight.
   if (name.startsWith('slow')) await new Promise((resolve) => setTimeout(resolve, 1500))
   const page = Number(url.searchParams.get('page') ?? 1)
   const matches = name ? characters.filter((c) => c.name.toLowerCase().includes(name)) : characters
@@ -136,7 +126,6 @@ createServer((req, res) => {
 
   if (path === '/api/character') return listCharacters(url, res)
 
-  // /api/{character|episode|location}/1 -> object, /api/.../1,2,3 -> array (like the real API).
   const byId = /^\/api\/(character|episode|location)\/([\d,]+)$/.exec(path)
   if (byId) {
     const [, resource, ids] = byId

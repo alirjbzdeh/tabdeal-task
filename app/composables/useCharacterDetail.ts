@@ -11,27 +11,19 @@ export type LocationSummary = Pick<Location, 'id' | 'name' | 'type' | 'dimension
 export interface CharacterDetail {
   character: CharacterSummary
   episodes: EpisodeSummary[]
-  /** Origin first, then the last known location (once if they're the same place). */
   locations: LocationSummary[]
 }
 
-/**
- * Everything the detail page shows, fetched on the server (SSR):
- * the character, then its episodes and locations in parallel (one batched call each).
- * Resolves to `null` when the character doesn't exist, so the page can answer 404.
- */
 export function useCharacterDetail(id: MaybeRefOrGetter<number>) {
   const api = useApi()
 
   return useAsyncData<CharacterDetail | null>(
     () => `character:${toValue(id)}`,
-    // `signal` cancels these when the user leaves or opens another character first.
     async (_nuxtApp, { signal }) => {
       try {
         const character = await api<Character>(`/character/${toValue(id)}`, { signal })
 
         const episodeIds = idsFromUrls(character.episode)
-        // "unknown" origin/location has an empty URL, so it's skipped here.
         const locationIds = idsFromUrls([character.origin.url, character.location.url])
 
         const [episodes, locations] = await Promise.all([
@@ -45,8 +37,6 @@ export function useCharacterDetail(id: MaybeRefOrGetter<number>) {
 
         const locationsById = new Map(toArray(locations).map((l) => [l.id, l]))
 
-        // Keep only the fields the page renders: the API also sends every resident and
-        // character URL, which would bloat the SSR payload a lot (Earth has hundreds).
         return {
           character: {
             id: character.id,

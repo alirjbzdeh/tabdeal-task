@@ -4,7 +4,6 @@ import type { RouteLocationRaw } from 'vue-router'
 const props = defineProps<{
   page: number
   total: number
-  /** Builds the link for a page number. */
   to: (page: number) => RouteLocationRaw
 }>()
 
@@ -22,11 +21,10 @@ const controls = computed(() => ({
   last: { label: t('pagination.last'), page: props.total, disabled: isLast.value },
 }))
 
-// Links use `custom` rendering: vue-router ignores the query when matching the
-// active route, so it would mark every page link as aria-current="page".
 const itemClass =
-  'grid size-6 place-items-center rounded-full text-base leading-none font-medium text-muted transition-colors'
-const linkClass = `${itemClass} hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none`
+  'grid size-6 place-items-center rounded-full text-base leading-none font-medium transition-colors'
+const mutedClass = `${itemClass} text-muted`
+const linkClass = `${mutedClass} hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none`
 </script>
 
 <template>
@@ -38,7 +36,7 @@ const linkClass = `${itemClass} hover:text-foreground focus-visible:ring-2 focus
           role="link"
           aria-disabled="true"
           :aria-label="controls[key].label"
-          :class="[itemClass, 'opacity-40']"
+          :class="[mutedClass, 'opacity-40']"
         >
           <IconChevron :double="key === 'first'" class="size-4 rtl:rotate-180" />
         </span>
@@ -55,7 +53,7 @@ const linkClass = `${itemClass} hover:text-foreground focus-visible:ring-2 focus
       </li>
 
       <li v-for="item in items" :key="item">
-        <span v-if="typeof item !== 'number'" :class="itemClass" aria-hidden="true">…</span>
+        <span v-if="typeof item !== 'number'" :class="mutedClass" aria-hidden="true">…</span>
         <span
           v-else-if="item === page"
           :class="[itemClass, 'bg-accent text-base-dark']"
@@ -76,7 +74,7 @@ const linkClass = `${itemClass} hover:text-foreground focus-visible:ring-2 focus
           role="link"
           aria-disabled="true"
           :aria-label="controls[key].label"
-          :class="[itemClass, 'opacity-40']"
+          :class="[mutedClass, 'opacity-40']"
         >
           <IconChevron :double="key === 'last'" class="size-4 rotate-180 rtl:rotate-0" />
         </span>

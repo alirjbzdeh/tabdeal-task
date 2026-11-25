@@ -1,4 +1,3 @@
-<!-- Same box as CharacterCard, so swapping them doesn't shift the layout. -->
 <template>
   <div class="animate-pulse rounded-2xl border border-transparent p-4" aria-hidden="true">
     <div class="aspect-square w-full rounded-lg bg-placeholder" />

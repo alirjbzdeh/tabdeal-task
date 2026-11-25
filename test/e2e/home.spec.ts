@@ -8,6 +8,28 @@ test.describe('home page', () => {
     expect(html).toContain('Rick Sanchez')
     expect(html).toContain('Alive-Human')
     expect(html).toContain('href="/?page=2"')
+    expect(html).toMatch(/<link[^>]*rel="preload"[^>]*as="image"[^>]*fetchpriority="high"/)
+    expect(html).toContain('alt="Portrait of Rick Sanchez"')
+  })
+
+  test('has the page landmarks: banner, search, main, contentinfo', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByRole('banner')).toBeVisible()
+    await expect(page.getByRole('search')).toBeVisible()
+    await expect(page.getByRole('main')).toBeVisible()
+    const footer = page.getByRole('contentinfo')
+    await expect(footer.getByRole('link', { name: 'The Rick and Morty API' })).toHaveAttribute(
+      'href',
+      'https://rickandmortyapi.com',
+    )
+  })
+
+  test('the logo is only the "current page" on the plain home page', async ({ page }) => {
+    await page.goto('/')
+    const logo = page.getByRole('link', { name: /^Rick and Morty/ })
+    await expect(logo).toHaveAttribute('aria-current', 'page')
+    await page.goto('/?page=2')
+    await expect(logo).not.toHaveAttribute('aria-current')
   })
 
   test('search and page live in the URL and are server-rendered too', async ({ request }) => {
@@ -30,7 +52,7 @@ test.describe('home page', () => {
   test('search updates the results and the URL', async ({ page }) => {
     await page.goto('/?page=3', { waitUntil: 'networkidle' })
     await page.getByLabel('Search characters by name').fill('smith')
-    await expect(page).toHaveURL(/\?name=smith$/) // page resets to 1
+    await expect(page).toHaveURL(/\?name=smith$/)
     await expect(page.getByRole('link', { name: 'Morty Smith' })).toBeVisible()
   })
 

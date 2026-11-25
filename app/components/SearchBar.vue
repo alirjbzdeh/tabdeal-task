@@ -21,13 +21,11 @@ function emitSearch() {
   if (value !== props.modelValue) emit('search', value)
 }
 
-// Search while typing, after a short pause.
 function onInput() {
   cancel()
   timer = setTimeout(emitSearch, props.debounce)
 }
 
-// Keep the field in sync when the URL changes (back/forward, "clear search" link).
 watch(
   () => props.modelValue,
   (value) => {
@@ -38,8 +36,6 @@ watch(
   },
 )
 
-// Text typed before hydration would be wiped when v-model takes over the input.
-// Grab it first, then search for it once the component is live.
 let typedBeforeHydration = ''
 onBeforeMount(() => {
   const el = document.getElementById('character-search') as HTMLInputElement | null
@@ -56,7 +52,6 @@ onBeforeUnmount(cancel)
 </script>
 
 <template>
-  <!-- A real GET form: search works even before JS loads. -->
   <form
     role="search"
     :action="localePath('/')"
@@ -73,7 +68,7 @@ onBeforeUnmount(cancel)
       :placeholder="$t('search.placeholder')"
       autocomplete="off"
       enterkeyhint="search"
-      class="h-12 min-w-0 flex-1 rounded bg-input ps-4 pe-2 text-sm text-foreground placeholder:text-foreground-soft focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+      class="h-12 min-w-0 flex-1 rounded bg-input py-3 ps-4 pe-2 text-sm leading-normal text-foreground placeholder:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
       @input="onInput"
     />
     <button

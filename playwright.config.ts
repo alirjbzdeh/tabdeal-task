@@ -3,8 +3,6 @@ import { defineConfig, devices } from '@playwright/test'
 const PORT = 3100
 const MOCK_API_PORT = 3101
 
-// E2E runs against a real production build (so it checks actual SSR output), backed by a
-// local mock of the API: the real one is public and rate-limited, which makes tests flaky.
 export default defineConfig({
   testDir: 'test/e2e',
   fullyParallel: true,

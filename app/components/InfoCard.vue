@@ -1,7 +1,3 @@
-<!--
-  Episode / location card: bold title, a cyan line and a gray line.
-  The sr-only labels tell screen reader users what the two lines are ("Type: Planet").
--->
 <script setup lang="ts">
 defineProps<{
   title: string
@@ -9,7 +5,6 @@ defineProps<{
   accentLabel: string
   meta: string
   metaLabel: string
-  /** Machine-readable date for `meta`; renders it in a <time>. */
   datetime?: string
 }>()
 </script>

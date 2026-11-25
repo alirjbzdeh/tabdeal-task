@@ -24,14 +24,18 @@ describe('CharacterCard', () => {
   it('sizes the image (no layout shift) and lazy-loads unless told otherwise', async () => {
     const lazy = await mountSuspended(CharacterCard, { props: { character } })
     const img = lazy.find('img')
-    expect(img.attributes()).toMatchObject({ width: '300', height: '300', loading: 'lazy' })
-    // Decorative: the link text already names the character.
-    expect(img.attributes('alt')).toBe('')
+    expect(img.attributes()).toMatchObject({
+      width: '300',
+      height: '300',
+      loading: 'lazy',
+      fetchpriority: 'auto',
+    })
+    expect(img.attributes('alt')).toBe('Portrait of Rick Sanchez')
 
     const eager = await mountSuspended(CharacterCard, { props: { character, eager: true } })
     expect(eager.find('img').attributes()).toMatchObject({
       loading: 'eager',
-      fetchpriority: 'auto',
+      fetchpriority: 'high',
     })
 
     const lcp = await mountSuspended(CharacterCard, { props: { character, priority: true } })

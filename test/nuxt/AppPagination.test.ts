@@ -16,6 +16,8 @@ describe('AppPagination', () => {
     expect(current).toHaveLength(1)
     expect(current[0]!.attributes('aria-current')).toBe('page')
     expect(current[0]!.text()).toContain('3')
+    expect(current[0]!.classes()).toContain('text-base-dark')
+    expect(current[0]!.classes()).not.toContain('text-muted')
   })
 
   it('links to the right pages', async () => {

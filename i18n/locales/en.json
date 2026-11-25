@@ -70,7 +70,8 @@
       "statusUnknown": "Status unknown",
       "episodesOne": "Appears in {count} episode.",
       "episodesOther": "Appears in {count} episodes."
-    }
+    },
+    "portrait": "Portrait of {name}"
   },
   "errors": {
     "retry": "Try again",
@@ -109,5 +110,9 @@
     "title": "Something went wrong",
     "text": "An unexpected error happened. Please try again.",
     "back": "Back to all characters"
+  },
+  "footer": {
+    "credit": "Character data from",
+    "api": "The Rick and Morty API"
   }
 }

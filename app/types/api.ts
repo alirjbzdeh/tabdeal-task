@@ -1,10 +1,7 @@
-// Types for the Rick and Morty API: https://rickandmortyapi.com/documentation
-
 export type CharacterStatus = 'Alive' | 'Dead' | 'unknown'
 
 export interface ResourceRef {
   name: string
-  /** Empty string when the location is "unknown". */
   url: string
 }
 
@@ -27,7 +24,6 @@ export interface Episode {
   id: number
   name: string
   air_date: string
-  /** e.g. "S03E07" */
   episode: string
   characters: string[]
   url: string

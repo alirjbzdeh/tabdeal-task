@@ -1,4 +1,3 @@
-<!-- Single (‹) or double («) chevron. Points left; rotate with `class="rotate-180"` for right. -->
 <script setup lang="ts">
 defineProps<{ double?: boolean }>()
 </script>

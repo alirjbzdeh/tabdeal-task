@@ -1,4 +1,3 @@
-<!-- Section title with the lime icon in front ("Episodes", "Locations"). Icon goes in the slot. -->
 <script setup lang="ts">
 defineProps<{ title: string }>()
 </script>

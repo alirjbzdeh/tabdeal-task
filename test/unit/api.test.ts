@@ -74,7 +74,6 @@ describe('classifyApiError', () => {
     const abort = new DOMException('AsyncData request cancelled by deduplication', 'AbortError')
     expect(classifyApiError(abort)).toBe('aborted')
 
-    // What ofetch throws when the server can't be reached (Nuxt adds statusCode 500 after SSR).
     const offline = { statusCode: 500, message: '[GET] "/character": <no response> fetch failed' }
     expect(classifyApiError(offline)).toBe('network')
   })

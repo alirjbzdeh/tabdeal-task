@@ -1,4 +1,3 @@
-<!-- Empty / error message block. The title is a real heading so it shows up in the outline. -->
 <script setup lang="ts">
 withDefaults(defineProps<{ title: string; text?: string; level?: 1 | 2 }>(), {
   text: undefined,

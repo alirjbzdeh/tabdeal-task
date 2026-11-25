@@ -1,6 +1,5 @@
 import type { Character, CharacterStatus } from '~/types/api'
 
-/** "Dead-Human", "Alive-Alien", "Unknown-Unknown" (no spaces around the dash, as in the design). */
 export function formatStatusLine(character: Pick<Character, 'status' | 'species'>): string {
   return `${capitalize(character.status)}-${capitalize(character.species)}`
 }
@@ -11,7 +10,6 @@ export function statusTone(status: CharacterStatus): 'success' | 'danger' | 'unk
   return 'unknown'
 }
 
-/** "S03E07" -> "S03 E07" */
 export function formatEpisodeCode(code: string): string {
   return code.replace(/^(S\d+)(E\d+)$/i, '$1 $2')
 }
@@ -20,22 +18,15 @@ function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
-/** "Planet" -> "Planet", "" or "unknown" -> fallback. */
 export function orUnknown(value: string | null | undefined, fallback = 'Unknown'): string {
   return value && value.toLowerCase() !== 'unknown' ? value : fallback
 }
 
-/** The bits of vue-i18n that `describeCharacter` needs (kept tiny so it's easy to unit test). */
 export interface Translator {
   t: (key: string, named?: Record<string, unknown>) => string
   number: (value: number) => string
 }
 
-/**
- * A short description in the active language, used on the page and as the meta description,
- * e.g. "Rick Sanchez is a human from Earth (C-137). Alive, last seen at Citadel of Ricks.
- * Appears in 51 episodes." Names, species and places are API data and stay as they are.
- */
 export function describeCharacter(
   character: Pick<Character, 'name' | 'status' | 'species' | 'type' | 'origin' | 'location'>,
   episodeCount: number,

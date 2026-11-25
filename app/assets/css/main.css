@@ -1,12 +1,6 @@
 @import 'tailwindcss';
 
-/*
- * Design tokens (from the Figma file). The app is dark-only.
- * Every color, gradient and odd size lives here: components only use theme utilities
- * (no inline styles, no arbitrary values like text-[32px]).
- */
 @theme {
-  /* Colors */
   --color-foreground: #ffffff;
   --color-foreground-soft: #ffffffd9;
   --color-accent: #b2df28;
@@ -17,24 +11,21 @@
   --color-base: #2c2e30;
   --color-base-dark: #0e0e0e;
   --color-input: #3b3d3f;
-  /* Figma has #989a9c; nudged a hair lighter so it passes 4.5:1 on the tinted cards too. */
   --color-muted: #9c9ea0;
   --color-line: #404244;
   --color-placeholder: #999c9f52;
   --color-card: #0ad7f10a;
-  /* Lime glow behind the logo, made from the accent. */
-  --color-glow-core: color-mix(in srgb, var(--color-accent) 55%, transparent);
-  --color-glow-edge: color-mix(in srgb, var(--color-accent) 18%, transparent);
 
-  /* Typography */
-  /* Rubik for Latin, Vazirmatn for Persian (Rubik has no Persian glyphs). */
-  --font-sans: 'Rubik', 'Vazirmatn', ui-sans-serif, system-ui, sans-serif;
-  --text-display: 2rem; /* character name on desktop: 32/500 */
+  --font-sans: 'Rubik', ui-sans-serif, system-ui, sans-serif;
+  --font-persian: 'Vazirmatn', 'Rubik', ui-sans-serif, system-ui, sans-serif;
+  --font-system: ui-sans-serif, system-ui, sans-serif;
+  --text-display: 2rem;
   --text-display--line-height: 1.2;
-  --leading-compact: 1.2; /* Figma's 16px lines are 19px tall */
+  --leading-compact: 1.2;
 
-  /* Layout */
-  --container-page: 1608px; /* content column of the 1920 frame */
+  --container-page: 1608px;
+
+  --blur-glow: 68px;
 }
 
 @layer base {
@@ -50,9 +41,12 @@
   body {
     @apply bg-base font-sans text-foreground antialiased;
   }
+
+  html:lang(fa) body {
+    @apply font-persian;
+  }
 }
 
-/* Page column: 1608px of content (the Figma grid), centered, with side gutters. */
 @utility container-page {
   width: 100%;
   max-width: calc(var(--container-page) + 2rem);
@@ -60,21 +54,10 @@
   padding-inline: 1rem;
 }
 
-/* Header gradient: from the logo side (base) to the far side (near-black). Mirrors in RTL. */
 @utility bg-hero {
   background-image: linear-gradient(
     var(--hero-direction, to right),
-    var(--color-base),
-    var(--color-base-dark)
-  );
-}
-
-/* The lime glow. A radial gradient is much cheaper to paint than a big CSS blur. */
-@utility bg-glow {
-  background-image: radial-gradient(
-    closest-side,
-    var(--color-glow-core),
-    var(--color-glow-edge) 45%,
-    transparent
+    var(--color-base) 0%,
+    var(--color-base-dark) 50%
   );
 }

@@ -16,8 +16,17 @@ test.describe('character detail page', () => {
     expect(html).toContain('Dimension C-137')
     expect(html).toContain('Citadel of Ricks')
     expect(html).toContain('<title>Rick Sanchez · Rick and Morty</title>')
-    // Residents and episode character lists are stripped from the payload.
     expect(html).not.toContain('/api/character/50')
+  })
+
+  test('the character is one <article>: hero as its header, episodes and locations inside', async ({
+    page,
+  }) => {
+    await page.goto('/character/1')
+    const article = page.getByRole('article', { name: 'Rick Sanchez' })
+    await expect(article.getByRole('heading', { level: 1 })).toHaveText('Rick Sanchez')
+    await expect(article.getByRole('region', { name: 'Episodes' })).toBeVisible()
+    await expect(article.getByRole('region', { name: 'Locations' })).toBeVisible()
   })
 
   test('lists every episode and both locations, origin first', async ({ page }) => {
