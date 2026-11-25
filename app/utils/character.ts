@@ -1,4 +1,4 @@
-import type { Character, CharacterStatus } from '~/types/api'
+import type { Character, CharacterStatus } from '#shared/types/api'
 
 export function formatStatusLine(character: Pick<Character, 'status' | 'species'>): string {
   return `${capitalize(character.status)}-${capitalize(character.species)}`

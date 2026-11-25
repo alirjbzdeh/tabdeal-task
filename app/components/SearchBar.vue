@@ -1,11 +1,12 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{ modelValue?: string; debounce?: number }>(), {
   modelValue: '',
-  debounce: 400,
+  debounce: SEARCH_DEBOUNCE,
 })
 const emit = defineEmits<{ search: [value: string] }>()
 
 const localePath = useLocalePath()
+const inputId = useId()
 
 const text = ref(props.modelValue)
 let timer: ReturnType<typeof setTimeout> | undefined
@@ -38,7 +39,7 @@ watch(
 
 let typedBeforeHydration = ''
 onBeforeMount(() => {
-  const el = document.getElementById('character-search') as HTMLInputElement | null
+  const el = document.getElementById(inputId) as HTMLInputElement | null
   typedBeforeHydration = el?.value ?? ''
 })
 onMounted(() => {
@@ -59,9 +60,9 @@ onBeforeUnmount(cancel)
     class="flex h-20 items-center gap-4 rounded-lg bg-base p-4"
     @submit.prevent="emitSearch"
   >
-    <label for="character-search" class="sr-only">{{ $t('search.label') }}</label>
+    <label :for="inputId" class="sr-only">{{ $t('search.label') }}</label>
     <input
-      id="character-search"
+      :id="inputId"
       v-model="text"
       name="name"
       type="search"

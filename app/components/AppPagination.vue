@@ -10,16 +10,38 @@ const props = defineProps<{
 const { t } = useI18n()
 const { number } = useFormat()
 
-const items = computed(() => getVisiblePages(props.page, props.total))
-const isFirst = computed(() => props.page <= 1)
-const isLast = computed(() => props.page >= props.total)
+type Item =
+  | { kind: 'control'; key: string; label: string; page: number; disabled: boolean; icon: string }
+  | { kind: 'page'; key: string; page: number; current: boolean }
+  | { kind: 'gap'; key: string }
 
-const controls = computed(() => ({
-  first: { label: t('pagination.first'), page: 1, disabled: isFirst.value },
-  prev: { label: t('pagination.prev'), page: props.page - 1, disabled: isFirst.value },
-  next: { label: t('pagination.next'), page: props.page + 1, disabled: isLast.value },
-  last: { label: t('pagination.last'), page: props.total, disabled: isLast.value },
-}))
+const items = computed<Item[]>(() => {
+  const { page, total } = props
+  const atStart = page <= 1
+  const atEnd = page >= total
+  const control = (key: 'first' | 'prev' | 'next' | 'last', target: number, disabled: boolean) => ({
+    kind: 'control' as const,
+    key,
+    label: t(`pagination.${key}`),
+    page: target,
+    disabled,
+    icon: key === 'first' || key === 'prev' ? 'rtl:rotate-180' : 'rotate-180 rtl:rotate-0',
+  })
+
+  return [
+    control('first', 1, atStart),
+    control('prev', page - 1, atStart),
+    ...getVisiblePages(page, total).map((item) =>
+      typeof item === 'number'
+        ? { kind: 'page' as const, key: `page-${item}`, page: item, current: item === page }
+        : { kind: 'gap' as const, key: item },
+    ),
+    control('next', page + 1, atEnd),
+    control('last', total, atEnd),
+  ]
+})
+
+const pageLabel = computed(() => `${t('pagination.page')} `)
 
 const itemClass =
   'grid size-6 place-items-center rounded-full text-base leading-none font-medium transition-colors'
@@ -30,62 +52,42 @@ const linkClass = `${mutedClass} hover:text-foreground focus-visible:ring-2 focu
 <template>
   <nav v-if="total > 1" :aria-label="$t('pagination.label')" class="pt-4">
     <ul class="flex items-center justify-center gap-2">
-      <li v-for="key in ['first', 'prev'] as const" :key="key">
+      <li v-for="item in items" :key="item.key">
+        <span v-if="item.kind === 'gap'" :class="mutedClass" aria-hidden="true">…</span>
         <span
-          v-if="controls[key].disabled"
-          role="link"
-          aria-disabled="true"
-          :aria-label="controls[key].label"
-          :class="[mutedClass, 'opacity-40']"
-        >
-          <IconChevron :double="key === 'first'" class="size-4 rtl:rotate-180" />
-        </span>
-        <NuxtLink v-else v-slot="{ href, navigate }" :to="to(controls[key].page)" custom>
-          <a
-            :href="href ?? undefined"
-            :aria-label="controls[key].label"
-            :class="linkClass"
-            @click="navigate"
-          >
-            <IconChevron :double="key === 'first'" class="size-4 rtl:rotate-180" />
-          </a>
-        </NuxtLink>
-      </li>
-
-      <li v-for="item in items" :key="item">
-        <span v-if="typeof item !== 'number'" :class="mutedClass" aria-hidden="true">…</span>
-        <span
-          v-else-if="item === page"
+          v-else-if="item.kind === 'page' && item.current"
           :class="[itemClass, 'bg-accent text-base-dark']"
           aria-current="page"
         >
-          <span class="sr-only">{{ `${$t('pagination.page')} ` }}</span>{{ number(item) }}
+          <span class="sr-only">{{ pageLabel }}</span>{{ number(item.page) }}
         </span>
-        <NuxtLink v-else v-slot="{ href, navigate }" :to="to(item)" custom>
-          <a :href="href ?? undefined" :class="linkClass" @click="navigate">
-            <span class="sr-only">{{ `${$t('pagination.page')} ` }}</span>{{ number(item) }}
-          </a>
-        </NuxtLink>
-      </li>
-
-      <li v-for="key in ['next', 'last'] as const" :key="key">
         <span
-          v-if="controls[key].disabled"
+          v-else-if="item.kind === 'control' && item.disabled"
           role="link"
           aria-disabled="true"
-          :aria-label="controls[key].label"
+          :aria-label="item.label"
           :class="[mutedClass, 'opacity-40']"
         >
-          <IconChevron :double="key === 'last'" class="size-4 rotate-180 rtl:rotate-0" />
+          <IconChevron
+            :double="item.key === 'first' || item.key === 'last'"
+            :class="['size-4', item.icon]"
+          />
         </span>
-        <NuxtLink v-else v-slot="{ href, navigate }" :to="to(controls[key].page)" custom>
+        <NuxtLink v-else v-slot="{ href, navigate }" :to="to(item.page)" custom>
           <a
             :href="href ?? undefined"
-            :aria-label="controls[key].label"
+            :aria-label="item.kind === 'control' ? item.label : undefined"
             :class="linkClass"
             @click="navigate"
           >
-            <IconChevron :double="key === 'last'" class="size-4 rotate-180 rtl:rotate-0" />
+            <IconChevron
+              v-if="item.kind === 'control'"
+              :double="item.key === 'first' || item.key === 'last'"
+              :class="['size-4', item.icon]"
+            />
+            <template v-else>
+              <span class="sr-only">{{ pageLabel }}</span>{{ number(item.page) }}
+            </template>
           </a>
         </NuxtLink>
       </li>

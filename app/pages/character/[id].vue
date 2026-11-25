@@ -52,26 +52,14 @@ useSeoMeta({
         </HeroBand>
 
         <div class="container-page py-8 md:py-16">
-          <StateMessage v-if="apiError" :title="apiError.title" :text="apiError.message">
-            <button
-              v-if="apiError.canRetry"
-              type="button"
-              class="mt-2 h-12 rounded bg-accent px-6 font-medium text-on-accent hover:brightness-110"
-              @click="refresh()"
-            >
-              {{ $t('errors.retry') }}
-            </button>
-          </StateMessage>
+          <ApiErrorMessage v-if="apiError" :error="apiError" @retry="refresh()" />
 
           <div v-else-if="character" class="flex flex-col gap-12 md:gap-16">
             <section aria-labelledby="episodes-heading">
               <SectionHeading id="episodes-heading" :title="$t('character.episodes')">
                 <IconEpisodes class="h-4 w-5" />
               </SectionHeading>
-              <ul
-                v-if="episodes.length"
-                class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-              >
+              <ul v-if="episodes.length" class="card-grid mt-6">
                 <li v-for="episode in episodes" :key="episode.id">
                   <InfoCard
                     :title="episode.name"
@@ -90,10 +78,7 @@ useSeoMeta({
               <SectionHeading id="locations-heading" :title="$t('character.locations')">
                 <IconPin class="h-5 w-4" />
               </SectionHeading>
-              <ul
-                v-if="locations.length"
-                class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-              >
+              <ul v-if="locations.length" class="card-grid mt-6">
                 <li v-for="location in locations" :key="location.id">
                   <InfoCard
                     :title="location.name"

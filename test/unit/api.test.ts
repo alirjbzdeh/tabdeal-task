@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { classifyApiError, idFromUrl, idsFromUrls, isNotFound, toArray } from '~/utils/api'
+import { idFromUrl, idsFromUrls, toArray } from '#shared/utils/resources'
+import { classifyApiError, isNotFound } from '~/utils/api'
 
 describe('toArray', () => {
   it('wraps a single object (API returns an object for one id)', () => {
@@ -63,6 +64,8 @@ describe('classifyApiError', () => {
     expect(classifyApiError(httpError(429))).toBe('rateLimited')
     expect(classifyApiError(httpError(500))).toBe('server')
     expect(classifyApiError(httpError(503))).toBe('server')
+    expect(classifyApiError(httpError(502))).toBe('server')
+    expect(classifyApiError(httpError(504))).toBe('timeout')
     expect(classifyApiError({ response: { status: 429 } })).toBe('rateLimited')
   })
 

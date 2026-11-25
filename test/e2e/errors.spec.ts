@@ -31,15 +31,16 @@ test.describe('API errors and cancelling', () => {
   })
 
   test('a newer search cancels the request still in flight', async ({ page }) => {
+    const slow = `slow${Date.now()}`
     await page.goto('/', { waitUntil: 'networkidle' })
     const cancelled: string[] = []
     page.on('requestfailed', (request) => {
-      if (request.url().includes('name=slow')) cancelled.push(request.failure()?.errorText ?? '')
+      if (request.url().includes(`name=${slow}`)) cancelled.push(request.failure()?.errorText ?? '')
     })
 
     const input = page.getByLabel('Search characters by name')
-    await input.fill('slow')
-    await page.waitForRequest((r) => r.url().includes('name=slow'))
+    await input.fill(slow)
+    await page.waitForRequest((r) => r.url().includes(`name=${slow}`))
     await input.fill('rick')
     await expect(page).toHaveURL(/\?name=rick$/)
     await expect(page.getByRole('link', { name: 'Rick Sanchez' })).toBeVisible()

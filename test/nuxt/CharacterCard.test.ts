@@ -1,7 +1,7 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
 import CharacterCard from '~/components/CharacterCard.vue'
-import type { Character } from '~/types/api'
+import type { Character } from '#shared/types/api'
 
 const character: Pick<Character, 'id' | 'name' | 'status' | 'species' | 'image'> = {
   id: 1,

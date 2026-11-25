@@ -1,19 +1,3 @@
-export function toArray<T>(value: T | T[] | null | undefined): T[] {
-  if (value == null) return []
-  return Array.isArray(value) ? value : [value]
-}
-
-export function idFromUrl(url: string | null | undefined): number | null {
-  if (!url) return null
-  const match = /\/(\d+)\/?$/.exec(url)
-  return match ? Number(match[1]) : null
-}
-
-export function idsFromUrls(urls: readonly string[]): number[] {
-  const ids = urls.map(idFromUrl).filter((id): id is number => id !== null)
-  return [...new Set(ids)]
-}
-
 export function isNotFound(error: unknown): boolean {
   return (
     typeof error === 'object' &&
@@ -59,6 +43,7 @@ export function classifyApiError(error: unknown): ApiErrorKind {
 
   if (status === 404) return 'notFound'
   if (status === 429) return 'rateLimited'
+  if (status === 504) return 'timeout'
   if (status !== undefined && status >= 400 && status < 500) return 'badRequest'
   if (status !== undefined && status >= 500) return 'server'
   return 'unknown'

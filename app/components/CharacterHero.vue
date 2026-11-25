@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import type { CharacterSummary, EpisodeSummary } from '~/composables/useCharacterDetail'
+import type { CharacterSummary, EpisodeSummary } from '#shared/types/models'
 
 const props = defineProps<{
   character: CharacterSummary
   episodes: EpisodeSummary[]
 }>()
-
-const dotClass = computed(
-  () =>
-    ({ success: 'bg-success', danger: 'bg-danger', unknown: 'bg-muted' })[
-      statusTone(props.character.status)
-    ],
-)
 
 const { t } = useI18n()
 const { number } = useFormat()
@@ -60,11 +53,7 @@ const facts = computed(() => {
       <h1 id="character-name" class="text-2xl leading-tight font-medium md:text-display">
         {{ character.name }}
       </h1>
-      <p class="mt-2 flex items-center gap-2 leading-5">
-        <span class="size-3 shrink-0 rounded-full" :class="dotClass" aria-hidden="true" />
-        <span class="sr-only">{{ $t('character.status') }}:</span>
-        {{ formatStatusLine(character) }}
-      </p>
+      <StatusLine :character="character" :label="$t('character.status')" class="mt-2" />
       <p class="mt-4 max-w-2xl leading-relaxed text-foreground-soft">{{ description }}</p>
       <dl class="mt-5 grid grid-cols-2 gap-x-8 gap-y-3 text-sm sm:flex sm:flex-wrap">
         <div v-for="fact in facts" :key="fact.label" class="min-w-0">

@@ -61,3 +61,11 @@
     var(--color-base-dark) 50%
   );
 }
+
+@utility card-grid {
+  @apply grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+}
+
+@utility btn-primary {
+  @apply inline-flex h-12 items-center justify-center rounded bg-accent px-6 font-medium text-on-accent transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:outline-none;
+}

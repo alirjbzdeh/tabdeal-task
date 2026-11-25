@@ -2,7 +2,10 @@ import { fileURLToPath } from 'node:url'
 import { defineVitestProject } from '@nuxt/test-utils/config'
 import { defineConfig } from 'vitest/config'
 
-const alias = { '~': fileURLToPath(new URL('./app', import.meta.url)) }
+const alias = {
+  '~': fileURLToPath(new URL('./app', import.meta.url)),
+  '#shared': fileURLToPath(new URL('./shared', import.meta.url)),
+}
 
 export default defineConfig({
   test: {
@@ -26,8 +29,9 @@ export default defineConfig({
     ],
     coverage: {
       provider: 'v8',
-      include: ['app/**/*.{ts,vue}'],
-      exclude: ['app/types/**'],
+      include: ['app/**/*.{ts,vue}', 'shared/**/*.ts'],
+      exclude: ['shared/types/**'],
+      thresholds: { statements: 55, branches: 60, functions: 45, lines: 55 },
     },
   },
 })

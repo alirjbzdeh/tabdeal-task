@@ -20,11 +20,7 @@ const goHome = () => clearError({ redirect: localePath('/') })
     <AppHeader />
     <main id="main" class="container-page flex-1">
       <StateMessage :level="1" :title="title" :text="text">
-        <a
-          :href="localePath('/')"
-          class="mt-2 inline-flex h-12 items-center rounded bg-accent px-6 font-medium text-on-accent hover:brightness-110"
-          @click.prevent="goHome"
-        >
+        <a :href="localePath('/')" class="btn-primary mt-2" @click.prevent="goHome">
           {{ $t('errorPage.back') }}
         </a>
       </StateMessage>

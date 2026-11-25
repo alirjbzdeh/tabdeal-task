@@ -15,9 +15,3 @@ export function getVisiblePages(current: number, total: number, size = 5): PageI
   if (end < total) items.push('ellipsis-end')
   return items
 }
-
-export function parsePage(value: unknown): number {
-  const raw = Array.isArray(value) ? value[0] : value
-  const page = Number.parseInt(String(raw ?? ''), 10)
-  return Number.isFinite(page) && page > 0 ? page : 1
-}

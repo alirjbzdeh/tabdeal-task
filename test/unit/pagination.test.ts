@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { getVisiblePages, parsePage } from '~/utils/pagination'
+import { parseName, parsePage } from '#shared/utils/query'
+import { getVisiblePages } from '~/utils/pagination'
 
 describe('getVisiblePages', () => {
   it('returns nothing when there is 0 or 1 page', () => {
@@ -50,5 +51,17 @@ describe('parsePage', () => {
     expect(parsePage('abc')).toBe(1)
     expect(parsePage('0')).toBe(1)
     expect(parsePage('-2')).toBe(1)
+  })
+})
+
+describe('parseName', () => {
+  it('takes the first value and trims it', () => {
+    expect(parseName('  rick ')).toBe('rick')
+    expect(parseName(['morty', 'rick'])).toBe('morty')
+    expect(parseName(undefined)).toBe('')
+  })
+
+  it('caps the length so the cache key stays small', () => {
+    expect(parseName('a'.repeat(500))).toHaveLength(100)
   })
 })

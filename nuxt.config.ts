@@ -1,6 +1,11 @@
 import tailwindcss from '@tailwindcss/vite'
 
 const imageProvider = process.env.VERCEL ? 'vercel' : process.env.NETLIFY ? 'netlify' : 'none'
+const apiBase = process.env.NUXT_API_BASE ?? 'https://rickandmortyapi.com/api'
+const apiOrigin = new URL(apiBase).origin
+
+const listCache = { swr: 3600, isr: { expiration: 3600, allowQuery: ['name', 'page'] } }
+const detailCache = { swr: 86400 }
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -23,9 +28,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    public: {
-      apiBase: 'https://rickandmortyapi.com/api',
-    },
+    apiBase,
   },
 
   fonts: {
@@ -61,10 +64,23 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/': { swr: 3600 },
-    '/fa': { swr: 3600 },
-    '/character/**': { swr: 86400 },
-    '/fa/character/**': { swr: 86400 },
+    '/': listCache,
+    '/fa': listCache,
+    '/character/**': detailCache,
+    '/fa/character/**': detailCache,
+  },
+
+  $production: {
+    routeRules: {
+      '/**': {
+        headers: {
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'DENY',
+          'Referrer-Policy': 'strict-origin-when-cross-origin',
+          'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+        },
+      },
+    },
   },
 
   app: {
@@ -77,7 +93,7 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
         ...(imageProvider === 'none'
-          ? [{ rel: 'preconnect', href: 'https://rickandmortyapi.com', crossorigin: '' } as const]
+          ? [{ rel: 'preconnect', href: apiOrigin, crossorigin: '' } as const]
           : []),
       ],
     },

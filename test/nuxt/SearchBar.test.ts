@@ -54,7 +54,9 @@ describe('SearchBar', () => {
 
   it('has an accessible label and a GET form fallback', async () => {
     const wrapper = await mountSuspended(SearchBar)
-    expect(wrapper.find('label[for="character-search"]').exists()).toBe(true)
+    const id = wrapper.find('input').attributes('id')
+    expect(id).toBeTruthy()
+    expect(wrapper.find('label').attributes('for')).toBe(id)
     expect(wrapper.find('form').attributes()).toMatchObject({ method: 'get', action: '/' })
     expect(wrapper.find('input').attributes('name')).toBe('name')
   })

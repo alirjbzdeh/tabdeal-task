@@ -28,7 +28,7 @@ export default defineConfig({
       command: 'npm run build && node .output/server/index.mjs',
       env: {
         PORT: String(PORT),
-        NUXT_PUBLIC_API_BASE: `http://localhost:${MOCK_API_PORT}/api`,
+        NUXT_API_BASE: `http://localhost:${MOCK_API_PORT}/api`,
       },
       url: `http://localhost:${PORT}`,
       reuseExistingServer: !process.env.CI,

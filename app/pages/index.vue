@@ -5,10 +5,7 @@ const localePath = useLocalePath()
 const { t } = useI18n()
 const { number } = useFormat()
 
-const name = computed(() => {
-  const raw = route.query.name
-  return String((Array.isArray(raw) ? raw[0] : raw) ?? '').trim()
-})
+const name = computed(() => parseName(route.query.name))
 const page = computed(() => parsePage(route.query.page))
 
 const { data, status, error, refresh } = await useCharacters(name, page)
@@ -67,24 +64,10 @@ useSeoMeta({ title })
         </template>
       </p>
 
-      <StateMessage v-if="apiError" :title="apiError.title" :text="apiError.message">
-        <button
-          v-if="apiError.canRetry"
-          type="button"
-          class="mt-2 h-12 rounded bg-accent px-6 font-medium text-on-accent hover:brightness-110"
-          @click="refresh()"
-        >
-          {{ $t('errors.retry') }}
-        </button>
-      </StateMessage>
+      <ApiErrorMessage v-if="apiError" :error="apiError" @retry="refresh()" />
 
-      <ul
-        v-else-if="isLoading"
-        class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-        aria-busy="true"
-        :aria-label="$t('home.loading')"
-      >
-        <li v-for="i in 20" :key="i"><CharacterCardSkeleton /></li>
+      <ul v-else-if="isLoading" class="card-grid" aria-busy="true" :aria-label="$t('home.loading')">
+        <li v-for="i in PAGE_SIZE" :key="i"><CharacterCardSkeleton /></li>
       </ul>
 
       <StateMessage
@@ -101,9 +84,13 @@ useSeoMeta({ title })
       </StateMessage>
 
       <template v-else>
-        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul class="card-grid">
           <li v-for="(character, index) in characters" :key="character.id">
-            <CharacterCard :character="character" :eager="index < 4" :priority="index === 0" />
+            <CharacterCard
+              :character="character"
+              :eager="index < FIRST_ROW_CARDS"
+              :priority="index === 0"
+            />
           </li>
         </ul>
         <AppPagination :page="page" :total="totalPages" :to="pageLink" class="mt-6" />

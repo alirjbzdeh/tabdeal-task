@@ -1,20 +1,13 @@
 <script setup lang="ts">
-import type { Character } from '~/types/api'
+import type { CharacterListItem } from '#shared/types/models'
 
-const props = defineProps<{
-  character: Pick<Character, 'id' | 'name' | 'status' | 'species' | 'image'>
+defineProps<{
+  character: CharacterListItem
   eager?: boolean
   priority?: boolean
 }>()
 
 const localePath = useLocalePath()
-
-const dotClass = computed(
-  () =>
-    ({ success: 'bg-success', danger: 'bg-danger', unknown: 'bg-muted' })[
-      statusTone(props.character.status)
-    ],
-)
 </script>
 
 <template>
@@ -39,9 +32,6 @@ const dotClass = computed(
         {{ character.name }}
       </NuxtLink>
     </h2>
-    <p class="mt-2 flex items-center gap-2 leading-5">
-      <span class="size-3 shrink-0 rounded-full" :class="dotClass" aria-hidden="true" />
-      <span class="truncate">{{ formatStatusLine(character) }}</span>
-    </p>
+    <StatusLine :character="character" class="mt-2" />
   </article>
 </template>
