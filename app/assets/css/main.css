@@ -10,7 +10,8 @@
   --color-base: #2c2e30;
   --color-base-dark: #0e0e0e;
   --color-input: #3b3d3f;
-  --color-muted: #989a9c;
+  /* Figma has #989a9c; nudged a hair lighter so it passes 4.5:1 on the tinted cards too. */
+  --color-muted: #9c9ea0;
   --color-line: #404244;
   --color-placeholder: #999c9f52;
   --color-card: #0ad7f10a;

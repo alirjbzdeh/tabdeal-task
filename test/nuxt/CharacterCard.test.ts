@@ -25,7 +25,8 @@ describe('CharacterCard', () => {
     const lazy = await mountSuspended(CharacterCard, { props: { character } })
     const img = lazy.find('img')
     expect(img.attributes()).toMatchObject({ width: '300', height: '300', loading: 'lazy' })
-    expect(img.attributes('alt')).toBe('Rick Sanchez')
+    // Decorative: the link text already names the character.
+    expect(img.attributes('alt')).toBe('')
 
     const eager = await mountSuspended(CharacterCard, { props: { character, eager: true } })
     expect(eager.find('img').attributes()).toMatchObject({

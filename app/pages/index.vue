@@ -53,11 +53,14 @@ useSeoMeta({
 
 <template>
   <div>
-    <AppHeader>
-      <SearchBar :model-value="name" @search="onSearch" />
-    </AppHeader>
+    <AppHeader />
+    <HeroBand>
+      <div class="pt-3 pb-6 md:pt-7">
+        <SearchBar :model-value="name" @search="onSearch" />
+      </div>
+    </HeroBand>
 
-    <main id="results" ref="results" class="container-page scroll-mt-4 py-8 md:py-16">
+    <main id="main" ref="results" class="container-page scroll-mt-4 py-8 md:py-16">
       <h1 class="sr-only">Rick and Morty characters</h1>
       <p class="sr-only" aria-live="polite">
         <template v-if="!isLoading">

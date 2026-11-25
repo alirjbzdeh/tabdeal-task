@@ -21,9 +21,10 @@ const dotClass = computed(
   <article
     class="relative rounded-2xl border border-transparent p-4 transition-colors focus-within:border-line hover:border-line"
   >
+    <!-- Decorative here: the name right below already says who it is (no double read-out). -->
     <NuxtImg
       :src="character.image"
-      :alt="character.name"
+      alt=""
       width="300"
       height="300"
       :loading="eager || priority ? 'eager' : 'lazy'"

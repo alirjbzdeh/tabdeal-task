@@ -30,7 +30,13 @@ const linkClass = `${itemClass} hover:text-white focus-visible:ring-2 focus-visi
   <nav v-if="total > 1" aria-label="Pagination" class="pt-4">
     <ul class="flex items-center justify-center gap-2">
       <li v-for="key in ['first', 'prev'] as const" :key="key">
-        <span v-if="controls[key].disabled" :class="[itemClass, 'opacity-40']" aria-hidden="true">
+        <span
+          v-if="controls[key].disabled"
+          role="link"
+          aria-disabled="true"
+          :aria-label="controls[key].label"
+          :class="[itemClass, 'opacity-40']"
+        >
           <IconChevron :double="key === 'first'" class="size-4" />
         </span>
         <NuxtLink v-else v-slot="{ href, navigate }" :to="to(controls[key].page)" custom>
@@ -62,7 +68,13 @@ const linkClass = `${itemClass} hover:text-white focus-visible:ring-2 focus-visi
       </li>
 
       <li v-for="key in ['next', 'last'] as const" :key="key">
-        <span v-if="controls[key].disabled" :class="[itemClass, 'opacity-40']" aria-hidden="true">
+        <span
+          v-if="controls[key].disabled"
+          role="link"
+          aria-disabled="true"
+          :aria-label="controls[key].label"
+          :class="[itemClass, 'opacity-40']"
+        >
           <IconChevron :double="key === 'last'" class="size-4 rotate-180" />
         </span>
         <NuxtLink v-else v-slot="{ href, navigate }" :to="to(controls[key].page)" custom>

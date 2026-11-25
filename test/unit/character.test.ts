@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { formatEpisodeCode, formatStatusLine, statusTone } from '~/utils/character'
+import {
+  describeCharacter,
+  formatEpisodeCode,
+  formatStatusLine,
+  orUnknown,
+  statusTone,
+} from '~/utils/character'
 
 describe('formatStatusLine', () => {
   it('joins status and species with a dash and no spaces', () => {
@@ -28,5 +34,48 @@ describe('formatEpisodeCode', () => {
 
   it('leaves unexpected formats alone', () => {
     expect(formatEpisodeCode('Special')).toBe('Special')
+  })
+})
+
+describe('orUnknown', () => {
+  it('passes real values through and replaces empty / "unknown"', () => {
+    expect(orUnknown('Planet')).toBe('Planet')
+    expect(orUnknown('')).toBe('Unknown')
+    expect(orUnknown('unknown')).toBe('Unknown')
+    expect(orUnknown(undefined, 'n/a')).toBe('n/a')
+  })
+})
+
+describe('describeCharacter', () => {
+  const rick = {
+    name: 'Rick Sanchez',
+    status: 'Alive' as const,
+    species: 'Human',
+    type: '',
+    origin: { name: 'Earth (C-137)', url: 'x/location/1' },
+    location: { name: 'Citadel of Ricks', url: 'x/location/3' },
+  }
+
+  it('writes a short description', () => {
+    expect(describeCharacter(rick, 51)).toBe(
+      'Rick Sanchez is a human from Earth (C-137). Alive, last seen at Citadel of Ricks. Appears in 51 episodes.',
+    )
+  })
+
+  it('handles unknowns, "an", the type and a single episode', () => {
+    const squanchy = {
+      ...rick,
+      name: 'Squanchy',
+      status: 'unknown' as const,
+      species: 'unknown',
+      origin: { name: 'unknown', url: '' },
+      location: { name: 'unknown', url: '' },
+    }
+    expect(describeCharacter(squanchy, 1)).toBe(
+      'Squanchy is a character of unknown species. Status unknown. Appears in 1 episode.',
+    )
+    expect(describeCharacter({ ...rick, species: 'Alien', type: 'Parasite' }, 2)).toContain(
+      'is an alien (Parasite) from',
+    )
   })
 })

@@ -8,32 +8,86 @@ const ORIGIN = `http://localhost:${PORT}`
 const PAGE_SIZE = 20
 const TOTAL = 826
 
+const api = (path) => `${ORIGIN}/api${path}`
+const range = (from, to) => Array.from({ length: to - from + 1 }, (_, i) => from + i)
+
+// Locations. Residents are included on purpose: the app must strip them from its payload.
+const locations = [
+  [1, 'Earth (C-137)', 'Planet', 'Dimension C-137'],
+  [2, 'Abadango', 'Cluster', 'unknown'],
+  [3, 'Citadel of Ricks', 'Space station', 'unknown'],
+  [4, 'Bird World', 'Planet', 'unknown'],
+].map(([id, name, type, dimension]) => ({
+  id,
+  name,
+  type,
+  dimension,
+  residents: range(1, 50).map((r) => api(`/character/${r}`)),
+  url: api(`/location/${id}`),
+  created: '2017-11-10T12:42:04.162Z',
+}))
+const place = (id) => ({ name: locations[id - 1].name, url: api(`/location/${id}`) })
+const UNKNOWN_PLACE = { name: 'unknown', url: '' }
+
+// 51 episodes, 10 per season. The first two have real names to assert on.
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August']
+const episodes = range(1, 51).map((id) => {
+  const season = Math.ceil(id / 10)
+  const number = id - (season - 1) * 10
+  const named = { 1: ['Pilot', 'December 2, 2013'], 2: ['Lawnmower Dog', 'December 9, 2013'] }
+  const [name, air_date] = named[id] ?? [
+    `Test Episode ${id}`,
+    `${months[id % 8]} ${(id % 28) + 1}, ${2013 + season}`,
+  ]
+  return {
+    id,
+    name,
+    air_date,
+    episode: `S${String(season).padStart(2, '0')}E${String(number).padStart(2, '0')}`,
+    characters: range(1, 20).map((c) => api(`/character/${c}`)),
+    url: api(`/episode/${id}`),
+    created: '2017-11-10T12:56:33.798Z',
+  }
+})
+const episodeUrls = (ids) => ids.map((id) => api(`/episode/${id}`))
+
+// [name, status, species, type, origin, location, episode ids]
 const known = [
-  ['Rick Sanchez', 'Alive', 'Human'],
-  ['Morty Smith', 'Alive', 'Human'],
-  ['Summer Smith', 'Alive', 'Human'],
-  ['Beth Smith', 'Alive', 'Human'],
-  ['Jerry Smith', 'Alive', 'Human'],
-  ['Birdperson', 'Dead', 'Bird-Person'],
-  ['Squanchy', 'unknown', 'unknown'],
+  ['Rick Sanchez', 'Alive', 'Human', '', place(1), place(3), range(1, 51)],
+  ['Morty Smith', 'Alive', 'Human', '', UNKNOWN_PLACE, place(3), range(1, 51)],
+  ['Summer Smith', 'Alive', 'Human', '', place(1), place(1), range(6, 51)],
+  ['Beth Smith', 'Alive', 'Human', '', place(1), place(1), range(6, 51)],
+  ['Jerry Smith', 'Alive', 'Human', '', place(1), place(1), range(6, 51)],
+  // Same origin and location: one location card.
+  ['Birdperson', 'Dead', 'Bird-Person', '', place(4), place(4), [11, 22]],
+  // Single episode (the API returns an object, not an array) and no known places.
+  ['Squanchy', 'unknown', 'unknown', 'Cat-Person', UNKNOWN_PLACE, UNKNOWN_PLACE, [16]],
 ]
 const statuses = ['Alive', 'Dead', 'unknown']
 
 const characters = Array.from({ length: TOTAL }, (_, i) => {
   const id = i + 1
-  const [name, status, species] = known[i] ?? [`Test Character ${id}`, statuses[id % 3], 'Alien']
+  const [name, status, species, type, origin, location, episodeIds] = known[i] ?? [
+    `Test Character ${id}`,
+    statuses[id % 3],
+    'Alien',
+    '',
+    place(2),
+    place(3),
+    [1, 2],
+  ]
   return {
     id,
     name,
     status,
     species,
-    type: '',
+    type,
     gender: 'Male',
-    origin: { name: 'Earth (C-137)', url: `${ORIGIN}/api/location/1` },
-    location: { name: 'Citadel of Ricks', url: `${ORIGIN}/api/location/3` },
+    origin,
+    location,
     image: `${ORIGIN}/avatar/${id}.svg`,
-    episode: [`${ORIGIN}/api/episode/1`, `${ORIGIN}/api/episode/2`],
-    url: `${ORIGIN}/api/character/${id}`,
+    episode: episodeUrls(episodeIds),
+    url: api(`/character/${id}`),
     created: '2017-11-04T18:48:46.250Z',
   }
 })
@@ -72,15 +126,20 @@ createServer((req, res) => {
 
   if (path === '/api/character') return listCharacters(url, res)
 
-  const byId = /^\/api\/character\/([\d,]+)$/.exec(path)
+  // /api/{character|episode|location}/1 -> object, /api/.../1,2,3 -> array (like the real API).
+  const byId = /^\/api\/(character|episode|location)\/([\d,]+)$/.exec(path)
   if (byId) {
-    const found = byId[1]
+    const [, resource, ids] = byId
+    const all = { character: characters, episode: episodes, location: locations }[resource]
+    const found = ids
       .split(',')
       .map(Number)
-      .map((id) => characters[id - 1])
+      .map((id) => all[id - 1])
       .filter(Boolean)
-    if (!byId[1].includes(',')) {
-      return found[0] ? send(res, 200, found[0]) : send(res, 404, { error: 'Character not found' })
+    if (!ids.includes(',')) {
+      return found[0]
+        ? send(res, 200, found[0])
+        : send(res, 404, { error: `${resource} not found` })
     }
     return send(res, 200, found)
   }

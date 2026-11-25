@@ -12,18 +12,14 @@ const EMPTY: Paginated<Character> = {
  * The API answers "no matches" (or a page past the end) with a 404, so that becomes an empty list.
  */
 export function useCharacters(name: MaybeRefOrGetter<string>, page: MaybeRefOrGetter<number>) {
-  const { apiBase } = useRuntimeConfig().public
+  const api = useApi()
 
   return useAsyncData(
     () => `characters:${toValue(name)}:${toValue(page)}`,
     async () => {
       try {
-        return await $fetch<Paginated<Character>>('/character', {
-          baseURL: apiBase,
+        return await api<Paginated<Character>>('/character', {
           query: { page: toValue(page), name: toValue(name) || undefined },
-          // The API rate-limits (429). Retry a few times before giving up.
-          retry: 3,
-          retryDelay: 500,
         })
       } catch (error) {
         if (isNotFound(error)) return EMPTY
