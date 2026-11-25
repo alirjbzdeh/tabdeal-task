@@ -63,15 +63,12 @@ export default defineNuxtConfig({
     screens: { hero: 240, card: 300, hero2x: 480, card2x: 600 },
   },
 
-  routeRules: {
-    '/': listCache,
-    '/fa': listCache,
-    '/character/**': detailCache,
-    '/fa/character/**': detailCache,
-  },
-
   $production: {
     routeRules: {
+      '/': listCache,
+      '/fa': listCache,
+      '/character/**': detailCache,
+      '/fa/character/**': detailCache,
       '/**': {
         headers: {
           'X-Content-Type-Options': 'nosniff',
