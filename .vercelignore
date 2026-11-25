@@ -1,0 +1,12 @@
+# Only the source is needed; Vercel installs and builds itself.
+CLAUDE.md
+postman/
+node_modules/
+.nuxt/
+.output/
+.netlify/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+.env*

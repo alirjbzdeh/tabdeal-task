@@ -36,13 +36,17 @@ export default defineNuxtConfig({
     defaults: { subsets: ['latin'] },
   },
 
-  // On Netlify, images go through the Netlify Image CDN (modern formats, cached at the edge,
-  // one origin fetch per image). Everywhere else they load straight from the API's CDN:
-  // proxying them through ipx would hit the API's rate limit (20 avatars per page view).
+  // On Vercel / Netlify, images go through the host's image CDN (AVIF/WebP, cached at the edge,
+  // one origin fetch per image). Both set an env var during the build. Everywhere else they load
+  // straight from the API's CDN: proxying them through ipx would hit the API's rate limit
+  // (20 avatars per page view).
   image: {
-    provider: process.env.NETLIFY ? 'netlify' : 'none',
+    provider: process.env.VERCEL ? 'vercel' : process.env.NETLIFY ? 'netlify' : 'none',
     domains: ['rickandmortyapi.com'],
     quality: 75,
+    // Vercel only resizes to widths listed here: add the ones we render (hero 240, card 300, and
+    // their 2x), so it doesn't round them up to 640. Merged with the default breakpoints.
+    screens: { hero: 240, card: 300, hero2x: 480, card2x: 600 },
   },
 
   // API data never changes, so cache rendered pages (stale-while-revalidate).
